@@ -6,7 +6,7 @@ import { Clock3, ChevronDown, LoaderCircle, MessageSquare, Send } from "lucide-r
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { EmailActivity, type EmailTab } from "@/components/email-activity";
-import { fetchAuthenticatedUser, fetchSlackConnectionStatus, getSlackAuthorizationUrl, getStoredToken, storeToken, type AuthenticatedUser } from "@/lib/auth";
+import { clearStoredToken, fetchAuthenticatedUser, fetchSlackConnectionStatus, getSlackAuthorizationUrl, getStoredToken, storeToken, type AuthenticatedUser } from "@/lib/auth";
 
 const initials = (name: string): string => name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("");
 
@@ -53,6 +53,11 @@ export function DashboardContent() {
     }
   };
 
+  const logout = () => {
+    clearStoredToken();
+    router.replace("/");
+  };
+
   if (!user) return <main className="grid min-h-screen place-items-center bg-white"><LoaderCircle className="size-7 animate-spin text-emerald-600" /></main>;
 
   return (
@@ -73,6 +78,7 @@ export function DashboardContent() {
           <div className="mt-auto border-t border-slate-100 pt-4">
             <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60" disabled={isConnectingSlack || slackConnected} onClick={connectSlack} type="button"><MessageSquare className="size-3.5 text-[#4A154B]" /> {slackConnected ? "Slack connected" : isConnectingSlack ? "Connecting Slack…" : "Connect Slack"}</button>
             {slackError && <p className="mt-2 text-center text-[10px] leading-4 text-red-600">{slackError}</p>}
+            <button className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50" onClick={logout} type="button">Logout</button>
           </div>
         </aside>
         <main className="min-w-0 flex-1"><EmailActivity activeTab={activeTab} onCountsChange={updateCounts} /></main>
