@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build Output
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Logs & Runtime Data
+logs/
+*.log
+npm-debug.log*
+docker-data/
+
+# Prisma
+# Note: Keep schema.prisma and migrations committed, ignore SQLite DB files if used locally
+*.db
+*.db-journal
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary & Test Files
+coverage/
+.nyc_output/
+*.tmp
+temp/

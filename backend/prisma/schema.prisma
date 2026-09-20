@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String     @id @default(uuid()) @db.Uuid
+  googleId        String     @unique @map("google_id")
+  email           String     @unique
+  name            String
+  avatarUrl       String?    @map("avatar_url")
+  slackWebhookUrl String?    @map("slack_webhook_url")
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  campaigns       Campaign[]
+
+  @@map("users")
+}
+
+model Campaign {
+  id          String           @id @default(uuid()) @db.Uuid
+  userId      String           @map("user_id") @db.Uuid
+  subject     String
+  body        String           @db.Text
+  hourlyLimit Int              @map("hourly_limit")
+  delayMs     Int              @map("delay_ms")
+  status      String           @default("PROCESSING")
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emails      ScheduledEmail[]
+
+  @@index([userId], map: "campaigns_user_id_idx")
+  @@map("campaigns")
+}
+
+model ScheduledEmail {
+  id             String    @id @default(uuid()) @db.Uuid
+  campaignId     String    @map("campaign_id") @db.Uuid
+  recipientEmail String    @map("recipient_email")
+  scheduledTime  DateTime  @map("scheduled_time")
+  status         String    @default("PENDING")
+  bullmqJobId    String?   @map("bullmq_job_id")
+  sentAt         DateTime? @map("sent_at")
+  errorLog       String?   @map("error_log") @db.Text
+
+  campaign       Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId], map: "scheduled_emails_campaign_id_idx")
+  @@index([scheduledTime, status], map: "scheduled_emails_scheduled_time_status_idx")
+  @@map("scheduled_emails")
+}
